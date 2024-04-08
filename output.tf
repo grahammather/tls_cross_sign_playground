@@ -1,5 +1,5 @@
 output "ca" {
-    value = "${var.output_dir}/${var.product}-ca.pem"
+    value = "${var.output_dir}/${var.product}-ca-2024.pem"
 }
 
 output "cert" {
