@@ -104,4 +104,8 @@ Use these other examples to experiment with and verify TLS connections with vari
 4. Connect with `ssl.go` using `test-ca-2024.pem`
 5. TLS handshake succeeds because the SSL client can iteratively try each of the intermediates presented by the server, and finds a valid trust chain of `leaf -> test-int-2024 -> test-ca-2024.pem`
 
+### Other root example (negative test)
 
+1. Use the `Server serves leaf, 2023 intermediate, and cross-signed 2024 intermediate` Server Bundle Block in `tls.tf`
+2. Connect with `ssl.go` using `other-root.crt`
+3. TLS handshake fails because `other-root.crt` is not a signing authority for either `2023 intermediate` or `cross-signed 2024 intermediate`.
