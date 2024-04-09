@@ -4,7 +4,7 @@ This is a module for learning about TLS cross signing. The idea is that you're t
 
 ## Naming convention
 
-The conceit of this module is that your existing resources are the "2023" version, and you want to migrate to the "2024"
+The conceit of this module is that your existing resources are the "2023" version, and you want to migrate to the "2024" version.
 
 [This tutorial](https://developer.hashicorp.com/vault/tutorials/secrets-management/pki-engine) walks you through something similar.
 
@@ -30,6 +30,28 @@ __Leaf Cert Signed by Intermediate 2023 Certificate Authority__
 
 This is the actual server certificate.
 
+## Build
+
+```
+terraform init
+terraform plan
+terraform apply
+```
+
+If you don't change any variables, the module will output the following files:
+
+```
+test/local_test/test-key.pem
+test/local_test/test-ca-2023.pem
+test/local_test/test-ca-2024.pem
+test/local_test/test-leaf.pem
+test/local_test/test-int-2024.pem
+test/local_test/test-crt.pem
+test/local_test/test-int-2023.pem
+```
+
+You can change the contents of `test/local_test/test-crt.pem` (which is the bundle the ngninx server serves) by uncommenting blocks of code at the end of `tls.tf`.
+
 ## Start
 
 ```
@@ -45,5 +67,29 @@ Use `ssl.go` like this:
 
 `go run ../ssl.go localhost:443 [other-root.crt|test-ca-2023.pem|test-ca-2024.pem]`
 
+_test-ca-2023.pem and test-ca-2024.pem_ are the Terraform outputs of the 
+
 ## Stop
 `docker stop my-nginx && docker rm my-nginx`
+
+## Examples
+
+Use these other examples to experiment with and verify TLS connections with various combinations of server cert bundle and root CA.
+
+### Basic example
+
+1. Use the `Server serves leaf and 2023 intermediate` Server Bundle Block in `tls.tf`
+2. Connect with `ssl.go` using `test-ca-2023.pem`
+3. TLS handshake succeeds.
+4. Connect with `ssl.go` using `test-ca-2024.pem`
+5. Connection fails because no trust chain can be built from the leaf to the root 2024 CA.
+
+### Cross sign example
+
+1. Use the `Server serves leaf, 2023 intermediate, and cross-signed 2024 intermediate` Server Bundle Block in `tls.tf`
+2. Connect with `ssl.go` using `test-ca-2023.pem`
+3. TLS handshake succeeds.
+4. Connect with `ssl.go` using `test-ca-2024.pem`
+5. TLS handshake succeeds because the SSL client can iteratively try each of the intermediates presented by the server, and finds a valid trust chain of `leaf -> test-int-2024 -> test-ca-2024.pem`
+
+

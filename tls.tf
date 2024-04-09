@@ -144,8 +144,14 @@ resource "local_file" "leaf" {
   filename = "${var.output_dir}/${var.product}-leaf.pem"
 }
 
+# =======================
+# Server Bundle Blocks
+# Leave just one "bundle" resource uncommented.
+# =======================
+
 # ==================
 # Server serves just the leaf 
+# Because the leaf is signed by the intermediate, TLS connections to the server should fail, because the chain can't be built. The intermediate CA is missing.
 #
 # resource "local_file" "bundle" {
 #   content  = tls_locally_signed_cert.leaf_signed_by_intermediate.cert_pem
@@ -154,6 +160,7 @@ resource "local_file" "leaf" {
 
 # ==================
 # Server serves leaf and 2023 intermediate
+# This is a basic success case. The leaf is signed by the 2023 intermediate, so the server should serve both the left and the intermediate that signed it.
 #
 # resource "local_file" "bundle" {
 #   content  = join("", [tls_locally_signed_cert.leaf_signed_by_intermediate.cert_pem, tls_locally_signed_cert.intermediate_signed_by_root_2023.cert_pem])
@@ -161,7 +168,8 @@ resource "local_file" "leaf" {
 # }
 
 # ==================
-# Server serves leaf, 2023 intermediate. and cross-signed 2024 intermediate
+# Server serves leaf, 2023 intermediate, and cross-signed 2024 intermediate
+# This server cert bundle is useful during the cross-signing transition phase, where clients will try to connect to the server using both the 2023 CA and 2024 CA in their trust store.
 #
 resource "local_file" "bundle" {
   content  = join("", [tls_locally_signed_cert.leaf_signed_by_intermediate.cert_pem, tls_locally_signed_cert.intermediate_signed_by_root_2023.cert_pem, tls_locally_signed_cert.intermediate_signed_by_root_2024.cert_pem])
