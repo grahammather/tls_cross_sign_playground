@@ -144,8 +144,27 @@ resource "local_file" "leaf" {
   filename = "${var.output_dir}/${var.product}-leaf.pem"
 }
 
+# ==================
+# Server serves just the leaf 
+#
+# resource "local_file" "bundle" {
+#   content  = tls_locally_signed_cert.leaf_signed_by_intermediate.cert_pem
+#   filename = "${var.output_dir}/${var.product}-crt.pem"
+# }
+
+# ==================
+# Server serves leaf and 2023 intermediate
+#
+# resource "local_file" "bundle" {
+#   content  = join("", [tls_locally_signed_cert.leaf_signed_by_intermediate.cert_pem, tls_locally_signed_cert.intermediate_signed_by_root_2023.cert_pem])
+#   filename = "${var.output_dir}/${var.product}-crt.pem"
+# }
+
+# ==================
+# Server serves leaf, 2023 intermediate. and cross-signed 2024 intermediate
+#
 resource "local_file" "bundle" {
-  content  = join("", [tls_locally_signed_cert.leaf_signed_by_intermediate.cert_pem, tls_locally_signed_cert.intermediate_signed_by_root_2024.cert_pem])
+  content  = join("", [tls_locally_signed_cert.leaf_signed_by_intermediate.cert_pem, tls_locally_signed_cert.intermediate_signed_by_root_2023.cert_pem, tls_locally_signed_cert.intermediate_signed_by_root_2024.cert_pem])
   filename = "${var.output_dir}/${var.product}-crt.pem"
 }
 

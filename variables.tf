@@ -7,7 +7,7 @@ variable "shared_sans" {
 
 variable "output_dir" {
   type = string
-  default = "./local_test"
+  default = "./test/local_test"
 }
 
 variable "product" {
