@@ -2,6 +2,20 @@
 
 This is a module for learning about TLS cross signing. The idea is that you're trying to use cross-signed intermediate certificates to rotate the root CA for a service that's in production deployment. The problem that this solves is that if you change your PKI infrastructure to suddenly start serving leaf certificates signed with a net-new chain of trust, services that try to connect to your TLS-protected service without having received the new root CA will get TLS handshake errors.
 
+## Prerequisites
+
+### Terraform
+
+Download and install [Terraform](https://releases.hashicorp.com/terraform/)
+
+### Docker
+
+In order to run the test server, you need [Docker](https://www.docker.com/) installed.
+
+### Go
+
+You need to be able to compile and run go programs. [Install Go](https://go.dev/dl/).
+
 ## Naming convention
 
 The conceit of this module is that your existing resources are the "2023" version, and you want to migrate to the "2024" version.
@@ -66,8 +80,6 @@ docker build -t my-nginx . && docker run --name my-nginx -d -p 443:443 my-nginx
 Use `ssl.go` like this:
 
 `go run ../ssl.go localhost:443 [other-root.crt|test-ca-2023.pem|test-ca-2024.pem]`
-
-_test-ca-2023.pem and test-ca-2024.pem_ are the Terraform outputs of the 
 
 ## Stop
 `docker stop my-nginx && docker rm my-nginx`
