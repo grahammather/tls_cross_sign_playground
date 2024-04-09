@@ -11,22 +11,22 @@ The conceit of this module is that your existing resources are the "2023" versio
 ## Key Terraform Resources
 The Terraform resources define the following:
 
-__Root 2023 Certificate Authority__
+### Root 2023 Certificate Authority
 Self-signed cert, making it a root CA. This is the old root CA that needs to be rotated out.
 
-__Root 2024 Certificate Authority__
+### Root 2024 Certificate Authority
 Self-signed cert, making it a root CA. This is the new root CA.
 
-__Intermediate 2023 Certificate Authority__
+### Intermediate 2023 Certificate Authority
 Intermediate cert signed by Root 2023
 
-__Cross-signed Intermediate 2024 Certificate Authority__
+### Cross-signed Intermediate 2024 Certificate Authority
 Intermediate CA that doesn't have its own private key, but instead is generated using the _Intermediate 2023 Certificate Authority_'s private key. Also has the exact same subject name as the _Intermediate 2023 Certificate Authority_. Its certificate request was signed by _Root 2024 Certificate Authority_ which means that leaf certs signed by _Intermediate 2023 Certificate Authority_ can be verified using two trust chains:
 
 - leaf -> Intermediate 2023 Certificate Authority -> Root 2023 Certificate Authority
 - leaf -> Cross-signed Intermediate 2024 Certificate Authority -> Root 2024 Certificate Authority
 
-__Leaf Cert Signed by Intermediate 2023 Certificate Authority__
+### Leaf Cert Signed by Intermediate 2023 Certificate Authority
 
 This is the actual server certificate.
 
