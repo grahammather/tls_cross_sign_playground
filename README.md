@@ -58,6 +58,7 @@ If you don't change any variables, the module will output the following files:
 test/local_test/test-key.pem
 test/local_test/test-ca-2023.pem
 test/local_test/test-ca-2024.pem
+test/local_test/test-ca-combined.pem
 test/local_test/test-leaf.pem
 test/local_test/test-int-2024.pem
 test/local_test/test-crt.pem
@@ -70,7 +71,7 @@ You can change the contents of `test/local_test/test-crt.pem` (which is the bund
 
 ```
 cd test/local_test
-docker build -t my-nginx . && docker run --name my-nginx -d -p 443:443 my-nginx
+docker build -t my-nginx . && docker run --rm --name my-nginx -d -p 443:443 my-nginx
 ```
 
 ## Test
@@ -82,7 +83,7 @@ Use `ssl.go` like this:
 `go run ../ssl.go localhost:443 [other-root.crt|test-ca-2023.pem|test-ca-2024.pem]`
 
 ## Stop
-`docker stop my-nginx && docker rm my-nginx`
+`docker stop my-nginx`
 
 ## Examples
 

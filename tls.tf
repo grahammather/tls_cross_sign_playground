@@ -128,6 +128,10 @@ resource "local_file" "root_2024" {
   filename = "${var.output_dir}/${var.product}-ca-2024.pem"
 }
 
+resource "local_file" "root_combined" {
+  content  = join("", [tls_self_signed_cert.root_2023.cert_pem, tls_self_signed_cert.root_2024.cert_pem])
+  filename = "${var.output_dir}/${var.product}-ca-combined.pem"
+}
 
 resource "local_file" "int_2023" {
   content  = tls_locally_signed_cert.intermediate_signed_by_root_2023.cert_pem
@@ -150,30 +154,21 @@ resource "local_file" "leaf" {
 # =======================
 
 # ==================
-# Server serves just the leaf 
-# Because the leaf is signed by the intermediate, TLS connections to the server should fail, because the chain can't be built. The intermediate CA is missing.
-#
-# resource "local_file" "bundle" {
-#   content  = tls_locally_signed_cert.leaf_signed_by_intermediate.cert_pem
-#   filename = "${var.output_dir}/${var.product}-crt.pem"
-# }
-
-# ==================
 # Server serves leaf and 2023 intermediate
 # This is a basic success case. The leaf is signed by the 2023 intermediate, so the server should serve both the left and the intermediate that signed it.
 #
-# resource "local_file" "bundle" {
-#   content  = join("", [tls_locally_signed_cert.leaf_signed_by_intermediate.cert_pem, tls_locally_signed_cert.intermediate_signed_by_root_2023.cert_pem])
-#   filename = "${var.output_dir}/${var.product}-crt.pem"
-# }
+resource "local_file" "leaf_and_2023_int_bundle" {
+  content  = join("", [tls_locally_signed_cert.leaf_signed_by_intermediate.cert_pem, tls_locally_signed_cert.intermediate_signed_by_root_2023.cert_pem])
+  filename = "${var.output_dir}/${var.product}-leaf-and-2023-int.pem"
+}
 
 # ==================
 # Server serves leaf, 2023 intermediate, and cross-signed 2024 intermediate
 # This server cert bundle is useful during the cross-signing transition phase, where clients will try to connect to the server using both the 2023 CA and 2024 CA in their trust store.
 #
-resource "local_file" "bundle" {
+resource "local_file" "leaf_and_xs_ints_bundle" {
   content  = join("", [tls_locally_signed_cert.leaf_signed_by_intermediate.cert_pem, tls_locally_signed_cert.intermediate_signed_by_root_2023.cert_pem, tls_locally_signed_cert.intermediate_signed_by_root_2024.cert_pem])
-  filename = "${var.output_dir}/${var.product}-crt.pem"
+  filename = "${var.output_dir}/${var.product}-leaf-and-xs-ints.pem"
 }
 
 resource "local_file" "leaf_key" {
